@@ -9,13 +9,20 @@ const initialPosition = {
 };
 
 export const MapPage = () => {
-  const { setRef, coords, newMarker$ } = useMapbox(initialPosition);
+  const { setRef, coords, newMarker$, markerMovement$ } =
+    useMapbox(initialPosition);
 
   useEffect(() => {
     newMarker$.subscribe((marker) => {
-      console.log(marker);
+      // console.log(marker);
     });
   }, [newMarker$]);
+
+  useEffect(() => {
+    markerMovement$.subscribe((marker) => {
+      console.log(marker);
+    });
+  }, [markerMovement$]);
 
   return (
     <>

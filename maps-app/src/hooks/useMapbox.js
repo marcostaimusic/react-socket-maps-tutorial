@@ -83,8 +83,3 @@ function useMapbox(initialPosition) {
 }
 
 export default useMapbox;
-// TODO cpmme
-
-// TODO cpmme
-
-// TODO cpmme
