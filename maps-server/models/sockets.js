@@ -18,6 +18,11 @@ class Sockets {
         this.markerList.addMarker(marker);
         socket.broadcast.emit("newMarker", marker);
       });
+
+      socket.on("movingMarker", (marker) => {
+        this.markerList.updateMarker(marker);
+        socket.broadcast.emit("movingMarker", marker);
+      });
     });
   }
 }

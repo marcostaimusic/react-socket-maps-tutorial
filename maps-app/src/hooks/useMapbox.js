@@ -19,21 +19,23 @@ export default function useMapbox(initialPosition) {
   const markerMovement = useRef(new Subject());
   const newMarker = useRef(new Subject());
 
-  const createMarker = useCallback((event) => {
+  const createMarker = useCallback((event, id) => {
     // console.log(event);
-    const { lng, lat } = event.lngLat;
+    const { lng, lat } = event.lngLat || event;
     const marker = new mapboxgl.Marker();
-    marker.id = v4();
+    marker.id = id ?? v4();
     marker.setLngLat([lng, lat]).addTo(mapRef.current).setDraggable(true);
 
     markers.current[marker.id] = marker;
 
     //check next() method
-    newMarker.current.next({
-      id: marker.id,
-      lng,
-      lat,
-    });
+    if (!id) {
+      newMarker.current.next({
+        id: marker.id,
+        lng,
+        lat,
+      });
+    }
 
     marker.on("drag", (event) => {
       const { id } = event.target;
@@ -45,6 +47,11 @@ export default function useMapbox(initialPosition) {
         lat,
       });
     });
+  }, []);
+
+  //fx to move markers
+  const moveMarker = useCallback((marker) => {
+    markers.current[marker.id].setLngLat([marker.lng, marker.lat]);
   }, []);
 
   useEffect(() => {
@@ -76,6 +83,7 @@ export default function useMapbox(initialPosition) {
     createMarker,
     coords,
     markers,
+    moveMarker,
     newMarker$: newMarker.current, // export the observable with the dollar sign
     markerMovement$: markerMovement.current,
     setRef,
