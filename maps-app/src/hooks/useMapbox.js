@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import { v4 } from "uuid";
+import { Subject } from "rxjs";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFyY29zdGFpbXVzaWMiLCJhIjoiY2t1Y2c4b3FzMGJzeDJxcnZ4YzBibHI3cCJ9.3V2bYl2BR-xtfYmGi6vF0g";
@@ -14,14 +15,36 @@ function useMapbox(initialPosition) {
   const [coords, setCoords] = useState(initialPosition);
   const markers = useRef({});
 
+  // Observables by rxjs simile a un observer
+  const markerMovement = useRef(new Subject());
+  const newMarker = useRef(new Subject());
+
   const createMarker = useCallback((event) => {
-    console.log(event);
+    // console.log(event);
     const { lng, lat } = event.lngLat;
     const marker = new mapboxgl.Marker();
     marker.id = v4();
     marker.setLngLat([lng, lat]).addTo(mapRef.current).setDraggable(true);
 
     markers.current[marker.id] = marker;
+
+    //check next() method
+    newMarker.current.next({
+      id: marker.id,
+      lng,
+      lat,
+    });
+
+    marker.on("drag", (event) => {
+      const { id } = event.target;
+      const { lng, lat } = event.target.getLngLat();
+
+      markerMovement.current.next({
+        id,
+        lng,
+        lat,
+      });
+    });
   });
 
   useEffect(() => {
@@ -53,8 +76,15 @@ function useMapbox(initialPosition) {
     createMarker,
     coords,
     markers,
+    newMarker$: newMarker.current, // export the observable with the dollar sign
+    markerMovement$: markerMovement.current,
     setRef,
   };
 }
 
 export default useMapbox;
+// TODO cpmme
+
+// TODO cpmme
+
+// TODO cpmme
