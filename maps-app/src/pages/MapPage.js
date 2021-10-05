@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
+import { SocketContext } from "../context/SocketContext";
 
 import useMapbox from "../hooks/useMapbox";
 
@@ -12,17 +13,35 @@ export const MapPage = () => {
   const { setRef, coords, newMarker$, markerMovement$ } =
     useMapbox(initialPosition);
 
+  const { socket } = useContext(SocketContext);
+
+  //listen to socket emitting active markers
+
+  useEffect(() => {
+    socket.on("activeMarkers", (markers) => {
+      console.log(markers);
+    });
+  }, [socket]);
+
   useEffect(() => {
     newMarker$.subscribe((marker) => {
-      // console.log(marker);
+      socket.emit("newMarker", marker);
     });
-  }, [newMarker$]);
+  }, [newMarker$, socket]);
 
   useEffect(() => {
     markerMovement$.subscribe((marker) => {
-      console.log(marker);
+      // console.log(marker);
     });
   }, [markerMovement$]);
+
+  //listen to new markers
+
+  useEffect(() => {
+    socket.on("newMarker", (marker) => {
+      console.log(marker);
+    });
+  }, [socket]);
 
   return (
     <>

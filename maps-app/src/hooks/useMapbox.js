@@ -6,7 +6,7 @@ import { Subject } from "rxjs";
 mapboxgl.accessToken =
   "pk.eyJ1IjoibWFyY29zdGFpbXVzaWMiLCJhIjoiY2t1Y2c4b3FzMGJzeDJxcnZ4YzBibHI3cCJ9.3V2bYl2BR-xtfYmGi6vF0g";
 
-function useMapbox(initialPosition) {
+export default function useMapbox(initialPosition) {
   const mapDiv = useRef();
   const setRef = useCallback((node) => {
     mapDiv.current = node;
@@ -45,7 +45,7 @@ function useMapbox(initialPosition) {
         lat,
       });
     });
-  });
+  }, []);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -81,5 +81,3 @@ function useMapbox(initialPosition) {
     setRef,
   };
 }
-
-export default useMapbox;
